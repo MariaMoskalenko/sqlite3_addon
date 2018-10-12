@@ -1,0 +1,12 @@
+{
+      "name": "sqlite3_addon_test",
+      "version": "0.0.0",
+      "description": "Test an sqlite3_addon",
+      "main": "./index.js",
+      "license": "MIT",
+      "dependencies": {
+            "html-extractor": "^0.2.2",
+            "nan": "^2.3.3",
+            "sqlite3_addon": "../sqlite3_addon"
+      }
+}

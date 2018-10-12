@@ -1,0 +1,12 @@
+{
+      "name": "sqlite3_addon",
+      "version": "0.0.0",
+      "description": "addon for usage sqlite3 from node js server",
+      "gypfile": true,
+      "main": "./build/Release/sqlite3_addon",
+      "license": "MIT",
+      "dependencies": {
+            "nan": "^2.11.1",
+            "node-gyp": "^3.8.0"
+      }
+}
