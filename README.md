@@ -22,4 +22,6 @@ How to build:
 - install: from test_addon folder in console "npm install".
 
 How to test:
-- in test_addon index.js http server is started on port 3000, so jest open in browser http://127.0.0.1:3000/ .
+- in test_addon index.js http server is started on port 3000, so just open in browser http://127.0.0.1:3000/ .
+
+Used example from: https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm .
