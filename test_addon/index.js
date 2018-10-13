@@ -13,7 +13,11 @@ var querysToInsert = "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)\
 					 VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );\
 					 INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)\
 					 VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
-var querySelect = "SELECT * from COMPANY";
+var querySelect = 	"SELECT * from COMPANY";
+var queryUpdate = 	"UPDATE COMPANY set SALARY = 25000.00 where ID=1;\
+					SELECT * from COMPANY";
+var queryDelete =   "DELETE from COMPANY where ID=2;\
+				    SELECT * from COMPANY";
 
 const requestHandler = (request, response) => {
 	if (request.url != '/favicon.ico') {
@@ -26,6 +30,10 @@ const requestHandler = (request, response) => {
 		res = obj.executeQuery(querysToInsert);
 		console.log("==> 3 " + res);
 		res = obj.executeQuery(querySelect);
+		console.log("==> 4 " + res);
+		res = obj.executeQuery(queryUpdate);
+		console.log("==> 4 " + res);
+		res = obj.executeQuery(queryDelete);
 		console.log("==> 4 " + res);
 		obj.closeDB();
 		response.writeHead(200, {'Content-Type': 'text/javascript'});

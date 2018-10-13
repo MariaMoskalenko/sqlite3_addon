@@ -22,39 +22,48 @@ var reduceToList2 = {
 };
 
 function parseFileFormQuery(fileName, outQuery) {
-	content = fs.readFileSync(fileName,"utf8");
-	var structure = {}; structure.id = []; structure.name = []; structure.status = [];
-	var myExtrator = new Extrator();
-	myExtrator.extract( content, reduceToList0, function( err, data0 ){
-		if( err ){
-			throw( err )
-		} else {
-			structure.id = data0.body;
-		}
-	});
-	myExtrator.extract( content, reduceToList1, function( err, data1 ){
-		if( err ){
-			throw( err )
-		} else {
-			structure.name = data1.body;
-		}
-	});
-	myExtrator.extract( content, reduceToList2, function( err, data2 ){
-		if( err ){
-			throw( err )
-		} else {
-			structure.status = data2.body;
-		}
-	});
-	structure.id.forEach(function(item, i) {
-		outQuery[i] = "INSERT INTO tickets VALUES(\"" + item + "\",";
-	});
-	structure.name.forEach(function(item, i) {
-		outQuery[i] += "\"" + item + "\",";
-	});
-	structure.status.forEach(function(item, i) {
-		outQuery[i] += "\"" + item + "\");";
-	});
+	try {
+		fs.statSync(fileName).isFile();
+		content = fs.readFileSync(fileName,"utf8");
+		var structure = {}; structure.id = []; structure.name = []; structure.status = [];
+		var myExtrator = new Extrator();
+		myExtrator.extract( content, reduceToList0, function( err, data0 ){
+			if( err ){
+				throw( err );
+			} else {
+				structure.id = data0.body;
+			}
+		});
+		myExtrator.extract( content, reduceToList1, function( err, data1 ){
+			if( err ){
+				throw( err )
+			} else {
+				structure.name = data1.body;
+			}
+		});
+		myExtrator.extract( content, reduceToList2, function( err, data2 ){
+			if( err ){
+				throw( err );
+			} else {
+				structure.status = data2.body;
+			}
+		});
+		structure.id.forEach(function(item, i) {
+			outQuery[i] = "INSERT INTO tickets VALUES(\"" + item + "\",";
+		});
+		structure.name.forEach(function(item, i) {
+			outQuery[i] += "\"" + item + "\",";
+		});
+		structure.status.forEach(function(item, i) {
+			outQuery[i] += "\"" + item + "\");";
+		});
+	}
+	catch (err) {
+		console.log(err);
+		return err.code;
+	}
+
+	
 }
 
 exports.parseFileFormQuery = parseFileFormQuery;

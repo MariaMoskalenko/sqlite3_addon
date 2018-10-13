@@ -5,15 +5,21 @@ const addon = require('sqlite3_addon');
 const parser = require("./parser");
 
 var queryCreate = "CREATE TABLE IF NOT EXISTS tickets(id UNIQUE, name, status);";
+var queryCheck = "SELECT * FROM tickets WHERE id IS NOT NULL;";
 var querysToInsert = [];
 var querySelect = "SELECT * from tickets";
 
 function formQueryToInsertAndExecute(instance, fileName, outQuery) {
-	parser.parseFileFormQuery(fileName, outQuery);
-	outQuery.forEach(function(item, i) {
-		var result = instance.executeQuery(item);
-		console.log( "==>" + result );
-	});
+	var reslt = parser.parseFileFormQuery(fileName, outQuery);
+	if ('ENOENT' != reslt) {
+		outQuery.forEach(function(item, i) {
+			var result = instance.executeQuery(item);
+			console.log( "==>" + result );
+		});
+	}
+	else {
+		return reslt;
+	}
 }
 
 const requestHandler = (request, response) => {
@@ -24,11 +30,23 @@ const requestHandler = (request, response) => {
 		console.log("==> 1 " + res);
 		res = obj.executeQuery(queryCreate);
 		console.log("==> 2 " + res);
-		formQueryToInsertAndExecute(obj, "output.html", querysToInsert);
-		formQueryToInsertAndExecute(obj, "output2.html", querysToInsert);
-		formQueryToInsertAndExecute(obj, "output3.html", querysToInsert);
-		res = obj.executeQuery(querySelect);
+		res = obj.executeQuery(queryCheck);
 		console.log("==> 3 " + res);
+		if (typeof(res) === "undefined" || !res) {
+			res = formQueryToInsertAndExecute(obj, "output.html", querysToInsert);
+			res = formQueryToInsertAndExecute(obj, "output2.html", querysToInsert);
+			res = formQueryToInsertAndExecute(obj, "output3.html", querysToInsert);
+			console.log("==> 3 " + res);
+		}
+		if ('ENOENT' != res) {
+			res = obj.executeQuery(querySelect);	
+			console.log("==> 4 " + res);
+		}
+		else {
+			res += " : cannot open file";
+			console.log("==> 4 error: " + res);
+			
+		}
 		obj.closeDB();
 		response.writeHead(200, {'Content-Type': 'text/javascript'});
 		response.write(res.toString() + " ");
