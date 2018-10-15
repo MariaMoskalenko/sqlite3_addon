@@ -40,7 +40,8 @@ const requestHandler = (request, response) => {
 			console.log("==> 3 " + res);
 		}
 		else {
-			console.log("==> 3 error: " + res);
+			console.log("==> 3 obj is not empty");
+			resQuery = {};
 		}
 		if ('ENOENT' != res) {
 			resQuery = obj.executeQuery(querySelect);

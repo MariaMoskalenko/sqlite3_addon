@@ -25,6 +25,7 @@ public:
     const std::string& getResultString();
     const std::string& getErrorMessage();
     const std::vector<std::string>& getResultVector();
+    void cleanResults();
 
 private:
 	sqlite3 *db;
@@ -49,6 +50,13 @@ inline const std::string& CSqlite3Wrapper::getErrorMessage()
 inline const std::vector<std::string>& CSqlite3Wrapper::getResultVector()
 {
     return mVecResults;
+}
+
+inline void CSqlite3Wrapper::cleanResults()
+{
+    mVecResults.clear();
+    mQueryResult = "";
+    mErrorMessage = "";
 }
 
 #endif

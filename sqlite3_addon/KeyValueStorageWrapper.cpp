@@ -108,6 +108,8 @@ NAN_METHOD(KeyValueStorageWrapper::openDB)
          auto result = std::bind(wrapper->onNotifyOpen, wrapper, std::placeholders::_1, std::placeholders::_2);
          printf("addCommandOpenDataBase result: %s, %d\n", resExec.c_str(), resExecError);
          info.GetReturnValue().Set(fromStdString(resExec));
+         resExec = "";
+         resExecError = 0;
     }
 }
 
@@ -126,6 +128,9 @@ NAN_METHOD(KeyValueStorageWrapper::executeQuery)
              //printf("addCommandExecuteQuery resExecQuery: %s\n", toStdString(resultList->Get(i)->ToString()).c_str());
         }
         info.GetReturnValue().Set(resultList);
+        resExecQuery.clear();
+        resExec = "";
+        resExecError = 0;
    }
 }
 
@@ -138,5 +143,7 @@ NAN_METHOD(KeyValueStorageWrapper::closeDB)
         auto result  = std::bind(wrapper->onNotifyClose, wrapper, std::placeholders::_1, std::placeholders::_2);
         printf("addCommandCloseDataBase result: %s, %d\n", resExec.c_str(), resExecError);
         info.GetReturnValue().Set(fromStdString(resExec));
+        resExec = "";
+        resExecError = 0;
    }
 }

@@ -34,4 +34,5 @@ void CommandExecuteQuery::execute()
       }
    }
    mParent.commandFinished(this);
+   mSqlWrapper.cleanResults();
 }
