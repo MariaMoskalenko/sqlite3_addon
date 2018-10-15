@@ -17,7 +17,7 @@ void CommandCloseDataBase::execute()
 {
    mResult = mSqlWrapper.closeDB();
    if(SQLITE_OK != mResult) {
-       mResultQuery = mSqlWrapper.errorMessage;
+       mResultQuery = mSqlWrapper.getErrorMessage();
        printf("Cannot close db, error: %s\n", mResultQuery.c_str());
    }
    mParent.commandFinished(this);

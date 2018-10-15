@@ -23,6 +23,7 @@ public:
     CommandType getCommandType() override;
     int getResult() override;
     const std::string& getResultQuery() override;
+    const std::vector<std::string> getResultsQuery() override { return {}; }
 
 private:
     CommandQueue& mParent;

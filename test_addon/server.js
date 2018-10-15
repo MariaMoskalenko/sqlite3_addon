@@ -27,6 +27,7 @@ const requestHandler = (request, response) => {
 		console.log("call new " + request.url);
 		var obj = new addon.CommandQueue();
 		var res = obj.openDB("myDatabase.db");
+		var resQuery = {}; var str = "";
 		console.log("==> 1 " + res);
 		res = obj.executeQuery(queryCreate);
 		console.log("==> 2 " + res);
@@ -39,8 +40,11 @@ const requestHandler = (request, response) => {
 			console.log("==> 3 " + res);
 		}
 		if ('ENOENT' != res) {
-			res = obj.executeQuery(querySelect);	
-			console.log("==> 4 " + res);
+			resQuery = obj.executeQuery(querySelect);
+			for(var i in resQuery) {
+				str += resQuery[i] + '\n';
+			}
+			//str = JSON.stringify(resQuery).toString();
 		}
 		else {
 			res += " : cannot open file";
@@ -49,7 +53,7 @@ const requestHandler = (request, response) => {
 		}
 		obj.closeDB();
 		response.writeHead(200, {'Content-Type': 'text/javascript'});
-		response.write(res.toString() + " ");
+		response.write(str + " ");
 		response.end();
 	}
 	else {
