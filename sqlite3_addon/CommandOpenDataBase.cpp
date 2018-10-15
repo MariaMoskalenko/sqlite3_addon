@@ -24,4 +24,5 @@ void CommandOpenDataBase::execute()
        printf("Cannot open db, error: %s\n", mResultQuery.c_str());
    }
    mParent.commandFinished(this);
+   mSqlWrapper.cleanResults();
 }

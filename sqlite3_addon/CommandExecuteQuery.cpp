@@ -25,6 +25,7 @@ void CommandExecuteQuery::execute()
       if(SQLITE_OK != mResult) {
           mResultQuery = mSqlWrapper.getErrorMessage();
           printf("Cannot execute query, error: %s\n", mResultQuery.c_str());
+          printf("Original query: %s\n", mQuery.c_str());
       }
       else {
            mResultsQuery = mSqlWrapper.getResultVector();

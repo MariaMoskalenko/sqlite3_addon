@@ -25,27 +25,33 @@ function parseFileFormQuery(fileName, outQuery) {
 	try {
 		fs.statSync(fileName).isFile();
 		content = fs.readFileSync(fileName,"utf8");
-		var structure = {}; structure.id = []; structure.name = []; structure.status = [];
+		var structure = {}; structure.id = [""]; structure.name = [""]; structure.status = [""];
 		var myExtrator = new Extrator();
 		myExtrator.extract( content, reduceToList0, function( err, data0 ){
 			if( err ){
 				throw( err );
 			} else {
-				structure.id = data0.body;
+				data0.body.forEach(function(item, i) {
+					structure.id.push(item.replace(/("|'|&quot;)/g, ""));
+				});
 			}
 		});
 		myExtrator.extract( content, reduceToList1, function( err, data1 ){
 			if( err ){
 				throw( err )
 			} else {
-				structure.name = data1.body;
+				data1.body.forEach(function(item, i) {
+					structure.name.push(item.replace(/("|'|&quot;)/g, ""));
+				});
 			}
 		});
 		myExtrator.extract( content, reduceToList2, function( err, data2 ){
 			if( err ){
 				throw( err );
 			} else {
-				structure.status = data2.body;
+				data2.body.forEach(function(item, i) {
+					structure.status.push(item.replace(/("|'|&quot;)/g, ""));
+				});
 			}
 		});
 		structure.id.forEach(function(item, i) {

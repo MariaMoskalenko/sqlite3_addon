@@ -21,4 +21,5 @@ void CommandCloseDataBase::execute()
        printf("Cannot close db, error: %s\n", mResultQuery.c_str());
    }
    mParent.commandFinished(this);
+   mSqlWrapper.cleanResults();
 }
