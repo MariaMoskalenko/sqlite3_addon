@@ -31,20 +31,26 @@ const requestHandler = (request, response) => {
 		res = obj.executeQuery(querysToInsert);
 		console.log("==> 3 " + res);
 		resQuery = obj.executeQuery(querySelect);
+		str += "Select: === 4 ===\n";
 		for(var i in resQuery) {
 			str += resQuery[i] + '\n';
 		}
 		console.log("==> 4 " + str);
+		str += "=== 4 ===\n";
 	    resp = obj.executeQuery(queryUpdate);
+		str += "Update: === 5 ===\n";
 		for(var i in resQuery) {
 			str += resQuery[i] + '\n';
 		}
 		console.log("==> 5 " + str);
+		str += "=== 5 ===\n";
 		resp = obj.executeQuery(queryDelete);
+		str += "Delete: === 6 ===\n";
 		for(var i in resQuery) {
 			str += resQuery[i] + '\n';
 		}
 		console.log("==> 6 " + str);
+		str += "=== 6 ===\n";
 		obj.closeDB();
 		response.writeHead(200, {'Content-Type': 'text/javascript'});
 		response.write(str.toString() + " ");

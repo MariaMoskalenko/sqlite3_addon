@@ -31,19 +31,24 @@ const requestHandler = (request, response) => {
 		console.log("==> 1 " + res);
 		res = obj.executeQuery(queryCreate);
 		console.log("==> 2 " + res);
-		res = obj.executeQuery(queryCheck);
-		console.log("==> 3 " + res);
-		if (typeof(res) === "undefined" || !res) {
+		resQuery = obj.executeQuery(queryCheck);
+		if (Object.keys(resQuery).length === 0) {
+			console.log("==> 3 empty obj, inserting data");
 			res = formQueryToInsertAndExecute(obj, "output.html", querysToInsert);
 			res = formQueryToInsertAndExecute(obj, "output2.html", querysToInsert);
 			res = formQueryToInsertAndExecute(obj, "output3.html", querysToInsert);
 			console.log("==> 3 " + res);
 		}
+		else {
+			console.log("==> 3 error: " + res);
+		}
 		if ('ENOENT' != res) {
 			resQuery = obj.executeQuery(querySelect);
+			str += "Select: === 4 ===\n";
 			for(var i in resQuery) {
 				str += resQuery[i] + '\n';
 			}
+			str += "=== 4 ===\n";
 			//str = JSON.stringify(resQuery).toString();
 		}
 		else {
