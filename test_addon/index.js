@@ -34,7 +34,7 @@ const requestHandler = (request, response) => {
 		for(var i in resQuery) {
 			str += resQuery[i] + '\n';
 		}
-		console.log("==> 4 " + res);
+		console.log("==> 4 " + str);
 	    resp = obj.executeQuery(queryUpdate);
 		for(var i in resQuery) {
 			str += resQuery[i] + '\n';

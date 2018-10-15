@@ -56,60 +56,85 @@ int CSqlite3Wrapper::executeQuery(const char * input)
         printf("nullptr in query\n");
         return SQLITE_ERROR;
 	}
-
-    int error = sqlite3_prepare_v2(db, SQL, -1, &stmt, 0);
-    if (SQLITE_DONE != error && SQLITE_OK != error) {
-        mErrorMessage = sqlite3_errmsg(db);
-        printf("executeQuery sqlite3_prepare_v2 error: %s %d\n", mErrorMessage.c_str(), error);
+    int error = 1;
+    if (strstr(SQL, "SELECT") != nullptr) {
+        error = sqlite3_prepare_v2(db, SQL, -1, &stmt, 0);
+        if (SQLITE_DONE != error && SQLITE_OK != error) {
+            mErrorMessage = sqlite3_errmsg(db);
+            printf("executeQuery sqlite3_prepare_v2 error: %s %d\n", mErrorMessage.c_str(), error);
+        }
+        else {
+                while (sqlite3_step(stmt) == SQLITE_ROW)
+                {
+                    std::string strBuffer = "";
+                    std::stringstream strStream;
+                    int numCols = sqlite3_column_count(stmt);
+                    for (int i = 0; i < numCols; ++i)
+                    {
+                        switch (sqlite3_column_type(stmt, i))
+                        {
+                        case SQLITE3_TEXT:
+                        {
+                            strBuffer.append((const char*)sqlite3_column_text(stmt, i));
+                            strBuffer.append(" ");
+                            break;
+                        }
+                        case SQLITE_INTEGER:
+                        {
+                            strStream << sqlite3_column_int(stmt, i);
+                            //printf("strStream: %s\n", strStream.str().c_str());
+                            strBuffer.append(strStream.str());
+                            strBuffer.append(" ");
+                            strStream.str(std::string());
+                            strStream.clear();
+                            break;
+                        }
+                        case SQLITE_FLOAT:
+                        {
+                            strStream << sqlite3_column_double(stmt, i);
+                            //printf("strStream: %s\n", strStream.str().c_str());
+                            strBuffer.append(strStream.str());
+                            strBuffer.append(" ");
+                            strStream.str(std::string());
+                            strStream.clear();
+                            break;
+                        }
+                        case  SQLITE_BLOB:
+                        {
+                            //serialization, data buffer
+                            break;
+                        }
+                        case SQLITE_NULL:
+                        {
+                            //no value
+                            break;
+                        }
+                        default:
+                            break;
+                        }
+                        //printf("strBuffer: %s; %d\n", strBuffer.c_str(), numCols);
+                    }
+                    strBuffer.append("\0");
+                    mVecResults.push_back(strBuffer);
+                }
+            }
+            if (SQLITE_OK!= error) {
+               mErrorMessage = sqlite3_errmsg(db);
+               printf("executeQuery step error (%d): %s\n", error, mErrorMessage.c_str());
+               return(error);
+            }
+            /*for (unsigned int i = 0; i < mVecResults.size(); i++ ) {
+                 printf("mVecResults: %s\n", mVecResults[i].c_str());
+            }*/
+            sqlite3_finalize(stmt);
     }
     else {
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            std::string strBuffer = "";
-            std::stringstream strStream;
-            int numCols = sqlite3_column_count(stmt);
-            for (int i = 0; i < numCols; ++i)
-            {
-                switch (sqlite3_column_type(stmt, i))
-                {
-                case SQLITE3_TEXT:
-                {
-                    strBuffer.append((const char*)sqlite3_column_text(stmt, i));
-                    strBuffer.append(" ");
-                    break;
-                }
-                case SQLITE_INTEGER:
-                {
-                    strStream << sqlite3_column_int(stmt, i);
-                    strBuffer.append(strStream.str());
-                    strBuffer.append(" ");
-                    break;
-                }
-                case SQLITE_FLOAT:
-                {
-                    strStream << sqlite3_column_double(stmt, i);
-                    strBuffer.append(strStream.str());
-                    strBuffer.append(" ");
-                    break;
-                }
-                default:
-                    break;
-                }
-                printf("strBuffer: %s; %d\n", strBuffer.c_str(), numCols);
-            }
-            strBuffer.append("\0");
-            mVecResults.push_back(strBuffer);
-        }
-        if (SQLITE_OK!= error) {
-           mErrorMessage = sqlite3_errmsg(db);
-           printf("executeQuery step error (%d): %s\n", error, mErrorMessage.c_str());
-           return(error);
-        }
-        for (unsigned int i = 0; i < mVecResults.size(); i++ ) {
-             printf("mVecResults: %s\n", mVecResults[i].c_str());
+        error = sqlite3_exec(db, SQL, 0, 0, 0);
+        printf("error in sqlite3_exec: %d\n", error);
+        if (SQLITE_OK != error) {
+            mErrorMessage = sqlite3_errmsg(db);
         }
     }
-    sqlite3_finalize(stmt);
     return error;
 }
 
