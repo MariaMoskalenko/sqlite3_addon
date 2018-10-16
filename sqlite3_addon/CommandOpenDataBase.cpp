@@ -19,9 +19,10 @@ CommandOpenDataBase::~CommandOpenDataBase()
 void CommandOpenDataBase::execute()
 {
    mResult = mSqlWrapper.openDB(mFileName.c_str());
-   if(SQLITE_OK != mResult) {
-       mResultQuery = mSqlWrapper.errorMessage;
+   if (SQLITE_DONE != mResult && SQLITE_OK != mResult) {
+       mResultQuery = mSqlWrapper.getErrorMessage();
        printf("Cannot open db, error: %s\n", mResultQuery.c_str());
    }
    mParent.commandFinished(this);
+   mSqlWrapper.cleanResults();
 }

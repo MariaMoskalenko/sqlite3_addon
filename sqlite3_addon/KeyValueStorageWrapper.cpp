@@ -10,6 +10,7 @@ using v8::Value;
 
 static std::string resExec = "";
 static int resExecError = 0;
+static std::vector<std::string> resExecQuery;
 
 std::string toStdString(v8::Local<v8::String> str) {
    return std::string(*v8::String::Utf8Value(str));
@@ -38,16 +39,18 @@ void KeyValueStorageWrapper::notifyReady(ICommand* const command)
 {
     printf("notifyReady cmdId=%d\n", command->getCommandType());
     resExecError = command->getResult();
-    resExec = command->getResultQuery();
-    printf("notifyReady resExecError=%d, resExec=%s\n", resExecError, resExec.c_str());
+    printf("notifyReady resExecError=%d\n", resExecError);
     switch(command->getCommandType()) {
     case CommandType::CommandOpenDataBase:
+        resExec = command->getResultQuery();
         onNotifyOpen;
         break;
     case CommandType::CommandExecuteQuery:
+        resExecQuery = command->getResultsQuery();
         onNotifyExecute;
         break;
     case CommandType::CommandCloseDataBase:
+        resExec = command->getResultQuery();
         onNotifyClose;
         break;
     default:
@@ -105,6 +108,8 @@ NAN_METHOD(KeyValueStorageWrapper::openDB)
          auto result = std::bind(wrapper->onNotifyOpen, wrapper, std::placeholders::_1, std::placeholders::_2);
          printf("addCommandOpenDataBase result: %s, %d\n", resExec.c_str(), resExecError);
          info.GetReturnValue().Set(fromStdString(resExec));
+         resExec = "";
+         resExecError = 0;
     }
 }
 
@@ -113,11 +118,19 @@ NAN_METHOD(KeyValueStorageWrapper::executeQuery)
    KeyValueStorageWrapper* wrapper = Nan::ObjectWrap::Unwrap<KeyValueStorageWrapper>(info.This());
    CommandQueue* wrappedObject = wrapper->GetWrapped();
    if (wrappedObject != nullptr) {
-        printf("addCommandExecuteQuery query: %s\n", toStdString(info[0]->ToObject()->ToString()).c_str());
         wrappedObject->addCommandExecuteQuery(toStdString(info[0]->ToObject()->ToString()));
         auto result  = std::bind(wrapper->onNotifyExecute, wrapper, std::placeholders::_1, std::placeholders::_2);
         printf("addCommandExecuteQuery result: %d\n", resExecError);
-        info.GetReturnValue().Set(fromStdString(resExec));
+        Local<v8::Object> resultList = v8::Object::New(info[0]->ToObject()->GetIsolate());
+        for (unsigned int i = 0; i < resExecQuery.size(); i++ ) {
+             Local<v8::Value> result = fromStdString(resExecQuery[i]);
+             resultList->Set(i, result);
+             //printf("addCommandExecuteQuery resExecQuery: %s\n", toStdString(resultList->Get(i)->ToString()).c_str());
+        }
+        info.GetReturnValue().Set(resultList);
+        resExecQuery.clear();
+        resExec = "";
+        resExecError = 0;
    }
 }
 
@@ -130,5 +143,7 @@ NAN_METHOD(KeyValueStorageWrapper::closeDB)
         auto result  = std::bind(wrapper->onNotifyClose, wrapper, std::placeholders::_1, std::placeholders::_2);
         printf("addCommandCloseDataBase result: %s, %d\n", resExec.c_str(), resExecError);
         info.GetReturnValue().Set(fromStdString(resExec));
+        resExec = "";
+        resExecError = 0;
    }
 }

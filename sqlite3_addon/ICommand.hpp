@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class CommandQueue;
 
@@ -30,6 +31,7 @@ public:
    virtual CommandType getCommandType() = 0;
    virtual int getResult() = 0;
    virtual const std::string& getResultQuery() = 0;
+   virtual const std::vector<std::string> getResultsQuery() = 0;
 };
 
 class ICommandListener

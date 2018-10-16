@@ -22,6 +22,7 @@ var queryDelete =   "DELETE from COMPANY where ID=2;\
 const requestHandler = (request, response) => {
 	if (request.url != '/favicon.ico') {
 		console.log("call new " + request.url);
+		var resQuery = {}; var str = "";
 		var obj = new addon.CommandQueue();
 		var res = obj.openDB("test.db");
 		console.log("==> 1 " + res);
@@ -29,15 +30,30 @@ const requestHandler = (request, response) => {
 		console.log("==> 2 " + res);
 		res = obj.executeQuery(querysToInsert);
 		console.log("==> 3 " + res);
-		res = obj.executeQuery(querySelect);
-		console.log("==> 4 " + res);
-		res = obj.executeQuery(queryUpdate);
-		console.log("==> 4 " + res);
-		res = obj.executeQuery(queryDelete);
-		console.log("==> 4 " + res);
+		resQuery = obj.executeQuery(querySelect);
+		str += "Select: === 4 ===\n";
+		for(var i in resQuery) {
+			str += resQuery[i] + '\n';
+		}
+		console.log("==> 4 " + str);
+		str += "=== 4 ===\n";
+	    resp = obj.executeQuery(queryUpdate);
+		str += "Update: === 5 ===\n";
+		for(var i in resQuery) {
+			str += resQuery[i] + '\n';
+		}
+		console.log("==> 5 " + str);
+		str += "=== 5 ===\n";
+		resp = obj.executeQuery(queryDelete);
+		str += "Delete: === 6 ===\n";
+		for(var i in resQuery) {
+			str += resQuery[i] + '\n';
+		}
+		console.log("==> 6 " + str);
+		str += "=== 6 ===\n";
 		obj.closeDB();
 		response.writeHead(200, {'Content-Type': 'text/javascript'});
-		response.write(res.toString() + " ");
+		response.write(str.toString() + " ");
 		response.end();
 	}
 	else {

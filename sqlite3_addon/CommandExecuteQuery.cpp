@@ -9,6 +9,7 @@ CommandExecuteQuery::CommandExecuteQuery(CommandQueue& parent
     , mSqlWrapper(sqlWrapper)
     , mResult(0)
     , mResultQuery("")
+    , mResultsQuery()
 {
 }
 
@@ -18,18 +19,21 @@ CommandExecuteQuery::~CommandExecuteQuery()
 
 void CommandExecuteQuery::execute()
 {
-   printf("Execute query: %s\n", mQuery.c_str());
    if (!mQuery.empty()) {
       mResult = mSqlWrapper.executeQuery(mQuery.c_str());
       printf("Execute query result: %d\n", mResult);
       if(SQLITE_OK != mResult) {
-          mResultQuery = mSqlWrapper.errorMessage;
+          mResultQuery = mSqlWrapper.getErrorMessage();
           printf("Cannot execute query, error: %s\n", mResultQuery.c_str());
+          printf("Original query: %s\n", mQuery.c_str());
       }
       else {
-           mResultQuery = mSqlWrapper.queryResult;
+           mResultsQuery = mSqlWrapper.getResultVector();
+           /*for (unsigned int i = 0; i < mResultsQuery.size(); i++ ) {
+                printf("mResultsQuery: %s\n", mResultsQuery[i].c_str());
+           }*/
       }
-      printf("Execute query result: %s\n", mResultQuery.c_str());
    }
    mParent.commandFinished(this);
+   mSqlWrapper.cleanResults();
 }

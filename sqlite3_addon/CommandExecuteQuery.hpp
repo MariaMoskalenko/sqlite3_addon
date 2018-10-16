@@ -23,6 +23,7 @@ public:
     CommandType getCommandType() override;
     int getResult() override;
     const std::string& getResultQuery() override;
+    const std::vector<std::string> CommandExecuteQuery::getResultsQuery() override;
 
 private:
     CommandQueue& mParent;
@@ -30,6 +31,7 @@ private:
     CSqlite3Wrapper& mSqlWrapper;
     int mResult;
     std::string mResultQuery;
+    std::vector<std::string> mResultsQuery;
 };
 
 inline CommandType CommandExecuteQuery::getCommandType()
@@ -45,6 +47,11 @@ inline int CommandExecuteQuery::getResult()
 inline const std::string& CommandExecuteQuery::getResultQuery()
 {
     return mResultQuery;
+}
+
+inline const std::vector<std::string> CommandExecuteQuery::getResultsQuery()
+{
+    return mResultsQuery;
 }
 
 #endif
