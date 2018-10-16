@@ -28,6 +28,8 @@ public:
     void cleanResults();
 
 private:
+    int writeBlob(sqlite3 *db, const char *sql, const char *filename);
+
 	sqlite3 *db;
     const char *fileName;
 	const char* SQL;

@@ -1,5 +1,7 @@
 #include "CSqlite3Wrapper.hpp"
 #include <sstream>
+#include <iostream>
+#include <fstream>
 
 CSqlite3Wrapper::CSqlite3Wrapper()
 	: db(nullptr)
@@ -129,10 +131,16 @@ int CSqlite3Wrapper::executeQuery(const char * input)
             sqlite3_finalize(stmt);
     }
     else {
-        error = sqlite3_exec(db, SQL, 0, 0, 0);
-        printf("error in sqlite3_exec: %d\n", error);
-        if (SQLITE_OK != error) {
-            mErrorMessage = sqlite3_errmsg(db);
+        if (strstr(SQL, "?") != nullptr) {
+            printf("strstr contains ?\n");
+            writeBlob(db, SQL, "sqlite.gif");
+        }
+        else {
+            error = sqlite3_exec(db, SQL, 0, 0, 0);
+            printf("error in sqlite3_exec: %d\n", error);
+            if (SQLITE_OK != error) {
+                mErrorMessage = sqlite3_errmsg(db);
+            }
         }
     }
     return error;
@@ -144,5 +152,51 @@ int CSqlite3Wrapper::closeDB()
     if (SQLITE_OK != error) {
         mErrorMessage = sqlite3_errmsg(db);
 	}
+    return error;
+}
+
+int CSqlite3Wrapper::writeBlob(sqlite3 *db, const char *sql, const char *filename)
+{
+    printf("writeBlob: enter\n");
+    std::ifstream file(filename, std::ios::in | std::ios::binary);
+    if (!file) {
+       printf("writeBlob: error open the file\n");
+       return SQLITE_ERROR;
+    }
+    file.seekg(0, std::ifstream::end);
+    int size = file.tellg();
+    file.seekg (0, file.beg);
+    char* buffer = new char[size];
+    file.read(buffer, size);
+    file.close();
+    printf("file is ready %d\n", size);
+    int error = sqlite3_prepare(db, sql, -1, &stmt, 0);
+    if (SQLITE_OK != error) {
+        printf("sqlite3_prepare nok %d\n", error);
+        mErrorMessage = sqlite3_errmsg(db);
+        delete[] buffer;
+        return error;
+    }
+    error = sqlite3_bind_int(stmt, 1, 1);
+    error = sqlite3_bind_text(stmt, 2, "", 0, NULL);
+    error = sqlite3_bind_int(stmt, 3, 1);
+    error = sqlite3_bind_text(stmt, 4, "", 0, NULL);
+    error = sqlite3_bind_double(stmt, 5, 5.00);
+    error = sqlite3_bind_blob(stmt, 5, buffer, size, SQLITE_STATIC);
+    if (SQLITE_OK != error) {
+        printf("sqlite3_bind_blob nok %d\n", error);
+        mErrorMessage = sqlite3_errmsg(db);
+        delete[] buffer;
+        return error;
+    }
+    error = sqlite3_step(stmt);
+    if (SQLITE_DONE != error) {
+        printf("sqlite3_step nok %d\n", error);
+        mErrorMessage = sqlite3_errmsg(db);
+        delete[] buffer;
+        return error;
+    }
+    error = sqlite3_finalize(stmt);
+    delete[] buffer;
     return error;
 }
